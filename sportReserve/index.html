@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportReserve</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <span style="color:var(--text2); font-size:0.9rem;">Carregando...</span>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- MODAL CANCELAR -->
+<div class="modal-overlay" id="modal-cancel">
+  <div class="modal-box">
+    <div class="modal-title">Cancelar reserva?</div>
+    <p style="color:var(--text2); font-size:0.9rem;">Esta ação não pode ser desfeita. Deseja realmente cancelar esta reserva?</p>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">Voltar</button>
+      <button class="btn-primary" style="background:var(--red);" onclick="confirmCancel()">Cancelar reserva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LANDING ===== -->
+<div id="page-landing">
+  <div class="landing-left">
+    <div class="brand-logo">Sport<span>Reserve</span></div>
+    <p class="landing-tagline">Reserve sua quadra em segundos.<br>Organize seus jogos com facilidade.</p>
+    <div class="sport-icons">
+      <div class="sport-icon-circle">⚽</div>
+      <div class="sport-icon-circle">🏀</div>
+      <div class="sport-icon-circle">🏐</div>
+    </div>
+    <div style="position:absolute; bottom:2rem; font-size:0.75rem; color:var(--text3); z-index:1;">
+      Sistema Acadêmico · UNEX
+    </div>
+  </div>
+  <div class="landing-right">
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login')">Entrar</div>
+        <div class="auth-tab" onclick="switchAuthTab('register')">Criar conta</div>
+      </div>
+
+      <div id="form-login">
+        <div class="auth-title">Bem-vindo! 👋</div>
+        <div class="auth-sub">Acesse sua conta para reservar quadras.</div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
+          <div class="form-error" id="err-login-email">E-mail inválido</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="login-pass" placeholder="••••••••">
+          <div class="form-error" id="err-login-pass">Senha incorreta</div>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Entrar</button>
+        <p style="text-align:center; margin-top:1rem; font-size:0.82rem; color:var(--text3);">Demo: qualquer e-mail + senha "123456"</p>
+      </div>
+
+      <div id="form-register" style="display:none;">
+        <div class="auth-title">Novo por aqui? 🏆</div>
+        <div class="auth-sub">Crie sua conta para reservar sua quadra agora mesmo.</div>
+        <div class="form-group">
+          <label class="form-label">Nome completo</label>
+          <input class="form-input" type="text" id="reg-name" placeholder="Seu nome">
+          <div class="form-error" id="err-reg-name">Campo obrigatório</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matrícula</label>
+          <input class="form-input" type="text" id="reg-mat" placeholder="Ex: 2024001234">
+          <div class="form-error" id="err-reg-mat">Campo obrigatório</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-input" type="email" id="reg-email" placeholder="seu@email.com">
+          <div class="form-error" id="err-reg-email">E-mail inválido</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
+          <div class="form-error" id="err-reg-pass">Mínimo 6 caracteres</div>
+        </div>
+        <button class="btn-primary" onclick="doRegister()">Criar conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">SR</div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item active" onclick="navTo('reservas')" data-page="reservas">
+        <span class="sidebar-icon">🏠</span>
+        <span class="sidebar-label">Início</span>
+      </div>
+      <div class="sidebar-item" onclick="navTo('nova-reserva')" data-page="nova-reserva">
+        <span class="sidebar-icon">➕</span>
+        <span class="sidebar-label">Nova</span>
+      </div>
+      <div class="sidebar-item" onclick="navTo('historico')" data-page="historico">
+        <span class="sidebar-icon">📋</span>
+        <span class="sidebar-label">Histórico</span>
+      </div>
+      <div class="sidebar-item" onclick="navTo('autorizacao')" data-page="autorizacao">
+        <span class="sidebar-icon">✅</span>
+        <span class="sidebar-label">Autorizar</span>
+      </div>
+      <div class="sidebar-item" onclick="navTo('perfil')" data-page="perfil">
+        <span class="sidebar-icon">👤</span>
+        <span class="sidebar-label">Perfil</span>
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-item" onclick="navTo('ajuda')" data-page="ajuda">
+        <span class="sidebar-icon">❓</span>
+        <span class="sidebar-label">Ajuda</span>
+      </div>
+      <div class="sidebar-item" onclick="doLogout()">
+        <span class="sidebar-icon">🚪</span>
+        <span class="sidebar-label">Sair</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Minhas Reservas</div>
+    <div class="topbar-right">
+      <div class="topbar-user" onclick="navTo('perfil')">
+        <div class="avatar" id="topbar-avatar">CL</div>
+        <span id="topbar-name">Clodoaldo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="main-content">
+
+    <!-- PAGE: RESERVAS -->
+    <div class="page active" id="p-reservas">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total de reservas</div>
+          <div class="stat-value blue" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Confirmadas</div>
+          <div class="stat-value green" id="stat-confirmed">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Canceladas</div>
+          <div class="stat-value red" id="stat-cancelled">0</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Próximas reservas</div>
+        <button class="btn-secondary" onclick="navTo('nova-reserva')">+ Nova reserva</button>
+      </div>
+
+      <div class="filter-tabs">
+        <div class="filter-tab active" onclick="filterReservas('todos', this)">Todos</div>
+        <div class="filter-tab" onclick="filterReservas('Futsal', this)">Futsal</div>
+        <div class="filter-tab" onclick="filterReservas('Vôlei', this)">Vôlei</div>
+        <div class="filter-tab" onclick="filterReservas('Basquete', this)">Basquete</div>
+      </div>
+
+      <div class="reserve-grid" id="reservas-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- PAGE: NOVA RESERVA -->
+    <div class="page" id="p-nova-reserva">
+      <div class="section-header">
+        <div class="section-title">Nova Reserva</div>
+      </div>
+      <p style="color:var(--text2); margin-bottom:1.5rem; font-size:0.9rem;">Escolha o esporte e agende sua quadra.</p>
+
+      <div class="sport-select-grid">
+        <div class="sport-select-card" onclick="selectSport('Futsal', this)">
+          <div class="sport-select-icon">⚽</div>
+          <div class="sport-select-name">Futsal</div>
+        </div>
+        <div class="sport-select-card" onclick="selectSport('Vôlei', this)">
+          <div class="sport-select-icon">🏐</div>
+          <div class="sport-select-name">Vôlei</div>
+        </div>
+        <div class="sport-select-card" onclick="selectSport('Basquete', this)">
+          <div class="sport-select-icon">🏀</div>
+          <div class="sport-select-name">Basquete</div>
+        </div>
+      </div>
+
+      <div class="card" id="form-reserva" style="display:none;">
+        <div class="card-title" id="form-reserva-title">Agendar — Futsal</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input class="form-input" type="date" id="res-date" onchange="loadSlots()">
+            <div class="form-error" id="err-res-date">Selecione uma data</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duração</label>
+            <select class="form-input" id="res-dur">
+              <option value="60">60 min</option>
+              <option value="90">90 min</option>
+              <option value="120">120 min</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Horário disponível</label>
+          <div class="time-slots" id="time-slots-container">
+            <!-- loaded by JS -->
+          </div>
+          <div class="form-error" id="err-res-time">Selecione um horário</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Adicionar jogadores (opcional)</label>
+          <input class="form-input" type="text" id="res-players" placeholder="Nome dos jogadores, separados por vírgula">
+        </div>
+
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+          <button class="btn-secondary" onclick="cancelForm()">Cancelar</button>
+          <button class="btn-primary" style="width:auto; padding:0.7rem 2rem;" onclick="submitReserva()">Confirmar Reserva ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: HISTORICO -->
+    <div class="page" id="p-historico">
+      <div class="section-header">
+        <div class="section-title">Histórico de Reservas</div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <input class="form-input" type="text" id="hist-search" placeholder="🔍 Buscar..." style="width:200px; padding:0.5rem 0.8rem;" oninput="renderHistorico()">
+        </div>
+      </div>
+      <div class="filter-tabs">
+        <div class="filter-tab active" onclick="filterHist('todos', this)">Todos</div>
+        <div class="filter-tab" onclick="filterHist('Futsal', this)">Futsal</div>
+        <div class="filter-tab" onclick="filterHist('Vôlei', this)">Vôlei</div>
+        <div class="filter-tab" onclick="filterHist('Basquete', this)">Basquete</div>
+      </div>
+      <div class="card" style="overflow-x:auto;">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Esporte</th>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Local</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+        <div id="hist-empty" class="empty-state" style="display:none;">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title">Nenhuma reserva encontrada</div>
+          <div class="empty-sub">Tente outro filtro ou busca</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: CONFIRMACAO -->
+    <div class="page" id="p-confirmacao">
+      <div class="confirm-box">
+        <div class="confirm-icon">✅</div>
+        <div class="confirm-title">Reserva Confirmada!</div>
+        <div class="confirm-sub">Sua quadra foi reservada com sucesso.</div>
+        <div class="confirm-details" id="confirm-details"></div>
+        <div class="confirm-btns">
+          <button class="btn-secondary" onclick="navTo('reservas')">Ver minhas reservas</button>
+          <button class="btn-primary" onclick="navTo('nova-reserva')">Nova reserva</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: PERFIL -->
+    <div class="page" id="p-perfil">
+      <div class="profile-header">
+        <div class="profile-avatar" id="prof-avatar" onclick="document.getElementById('avatar-upload').click()">CL</div>
+        <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+        <div>
+          <div class="profile-name" id="prof-name-display">Clodoaldo</div>
+          <div class="profile-email" id="prof-email-display">clodoaldo@unex.edu.br</div>
+          <div style="font-size:0.78rem; color:var(--text3); margin-top:2px;">Clique no avatar para alterar foto</div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <div class="card">
+          <div class="card-title">Dados pessoais</div>
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input class="form-input" type="text" id="prof-name" value="Clodoaldo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input class="form-input" type="email" id="prof-email" value="clodoaldo@unex.edu.br">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input class="form-input" type="tel" id="prof-phone" placeholder="(00) 00000-0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Matrícula</label>
+            <input class="form-input" type="text" id="prof-mat" placeholder="Sua matrícula">
+          </div>
+          <button class="btn-primary" onclick="saveProfile()">Salvar alterações</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Notificações</div>
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:600; font-size:0.9rem;">Confirmação de reserva</div>
+                <div style="font-size:0.78rem; color:var(--text2);">Receber quando reserva for confirmada</div>
+              </div>
+              <button class="toggle on" id="notif-1" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:600; font-size:0.9rem;">Lembrete de jogo</div>
+                <div style="font-size:0.78rem; color:var(--text2);">1 hora antes da partida</div>
+              </div>
+              <button class="toggle on" id="notif-2" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:600; font-size:0.9rem;">Cancelamentos</div>
+                <div style="font-size:0.78rem; color:var(--text2);">Avisos de cancelamento</div>
+              </div>
+              <button class="toggle" id="notif-3" onclick="this.classList.toggle('on')"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: AUTORIZACAO -->
+    <div class="page" id="p-autorizacao">
+      <div class="section-header">
+        <div class="section-title">Autorização de Quadras</div>
+        <div style="font-size:0.82rem; color:var(--text2);">Aprovação de reservas pendentes</div>
+      </div>
+      <div class="auth-list" id="auth-list"></div>
+    </div>
+
+    <!-- PAGE: AJUDA -->
+    <div class="page" id="p-ajuda">
+      <div class="section-header">
+        <div class="section-title">Central de Ajuda</div>
+      </div>
+      <div class="help-list">
+        <div class="help-item" onclick="toggleHelp(this)">
+          <div style="flex:1;">
+            <div class="help-item-title">Como fazer uma reserva?</div>
+            <div class="help-item-body">Clique em "Nova Reserva" no menu lateral, escolha o esporte (Futsal, Vôlei ou Basquete), selecione a data desejada, escolha um horário disponível e clique em "Confirmar Reserva".</div>
+          </div>
+          <span class="help-chevron">⌄</span>
+        </div>
+        <div class="help-item" onclick="toggleHelp(this)">
+          <div style="flex:1;">
+            <div class="help-item-title">Como cancelar uma reserva?</div>
+            <div class="help-item-body">Acesse "Minhas Reservas", encontre a reserva desejada e clique no botão "Cancelar". O cancelamento só pode ser feito com até 2 horas de antecedência.</div>
+          </div>
+          <span class="help-chevron">⌄</span>
+        </div>
+        <div class="help-item" onclick="toggleHelp(this)">
+          <div style="flex:1;">
+            <div class="help-item-title">Qual é o limite de reservas?</div>
+            <div class="help-item-body">Cada aluno pode ter no máximo 3 reservas ativas simultaneamente. Após o uso, a reserva é movida para o histórico e um novo slot é liberado.</div>
+          </div>
+          <span class="help-chevron">⌄</span>
+        </div>
+        <div class="help-item" onclick="toggleHelp(this)">
+          <div style="flex:1;">
+            <div class="help-item-title">Como funciona a autorização de quadras?</div>
+            <div class="help-item-body">Reservas feitas para horários de pico passam por uma etapa de autorização pela administração. Você receberá uma notificação quando sua reserva for aprovada ou recusada.</div>
+          </div>
+          <span class="help-chevron">⌄</span>
+        </div>
+        <div class="help-item" onclick="toggleHelp(this)">
+          <div style="flex:1;">
+            <div class="help-item-title">Horários de funcionamento</div>
+            <div class="help-item-body">As quadras estão disponíveis de segunda a sexta, das 07h às 22h. Aos sábados, das 08h às 18h. Domingos e feriados são fechadas.</div>
+          </div>
+          <span class="help-chevron">⌄</span>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1.5rem; text-align:center;">
+        <div style="font-size:0.9rem; color:var(--text2); margin-bottom:1rem;">Ainda com dúvidas? Entre em contato:</div>
+        <div style="font-weight:600;">📧 suporte@sportreserve.unex.edu.br</div>
+        <div style="font-size:0.85rem; color:var(--text3); margin-top:0.3rem;">📞 (79) 3999-1234 · ramal 218</div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<script src="script.js"></script>
+</body>
+</html>

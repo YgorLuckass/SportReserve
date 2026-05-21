@@ -1,0 +1,53 @@
+{
+  "reservas": [
+    {
+      "id": 1,
+      "sport": "Futsal",
+      "date": "2026-05-21",
+      "time": "15:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "confirmada",
+      "players": ""
+    },
+    {
+      "id": 2,
+      "sport": "Basquete",
+      "date": "2026-05-22",
+      "time": "10:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "pendente",
+      "players": ""
+    },
+    {
+      "id": 3,
+      "sport": "Vôlei",
+      "date": "2026-05-17",
+      "time": "16:00",
+      "dur": 90,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": ""
+    },
+    {
+      "id": 4,
+      "sport": "Futsal",
+      "date": "2026-05-13",
+      "time": "09:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "confirmada",
+      "players": ""
+    }
+  ],
+  "usuarios": [
+    {
+      "id": 1,
+      "name": "Clodoaldo",
+      "email": "clodoaldo@unex.edu.br",
+      "mat": "2024001234",
+      "phone": ""
+    }
+  ]
+}
