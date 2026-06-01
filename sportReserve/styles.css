@@ -129,11 +129,14 @@ body {
   font-size: 0.9rem;
   color: var(--text2);
   transition: var(--transition);
+  border: 1px solid var(--border2);
 }
 .auth-tab.active {
   background: var(--accent);
   color: #fff;
+  border-color: var(--accent);
 }
+.auth-tab:not(.active):hover { border-color: var(--text2); color: var(--text); }
 
 .auth-title {
   font-size: 1.8rem;
@@ -171,6 +174,20 @@ body {
 .form-input:focus { border-color: var(--accent); }
 .form-input::placeholder { color: var(--text3); }
 
+/* Calendário e selects — força tema escuro com ícone branco */
+.form-input[type="date"] {
+  color-scheme: dark;
+}
+.form-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+  cursor: pointer;
+}
+.form-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+
 .btn-primary {
   width: 100%;
   padding: 0.85rem;
@@ -190,7 +207,7 @@ body {
 .btn-primary:active { transform: translateY(0); }
 
 .btn-secondary {
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.4rem;
   background: transparent;
   color: var(--text);
   border: 1px solid var(--border2);
@@ -200,6 +217,9 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-secondary:hover { border-color: var(--text2); background: var(--bg-card2); }
 
@@ -266,9 +286,9 @@ body {
 }
 .sidebar-item:hover { background: var(--bg-card2); color: var(--text2); }
 .sidebar-item.active { background: rgba(230,57,70,0.15); color: var(--accent); }
-.sidebar-item.active .sidebar-icon { color: var(--accent); }
-.sidebar-icon { font-size: 1.4rem; }
-.sidebar-label { font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.sidebar-item.active .sidebar-icon { color: var(--accent) !important; }
+.sidebar-icon { font-size: 1.4rem; color: #cbd5e1; }
+.sidebar-label { font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #94a3b8; }
 
 .sidebar-bottom {
   display: flex;
@@ -407,14 +427,21 @@ body {
 }
 
 .btn-sm {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  width: 120px;
+  height: 34px;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
   border-radius: 6px;
   cursor: pointer;
   border: 1px solid;
   transition: var(--transition);
   font-family: 'Barlow', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .btn-danger { background: rgba(230,57,70,0.1); color: var(--red); border-color: rgba(230,57,70,0.3); }
 .btn-danger:hover { background: rgba(230,57,70,0.2); }
@@ -748,8 +775,22 @@ body {
   to { opacity: 1; transform: scale(1); }
 }
 .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 1.5rem; }
-.modal-btns { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; }
-.modal-btns .btn-primary { width: auto; padding: 0.65rem 1.5rem; }
+.modal-btns {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+.modal-btns .btn-primary,
+.modal-btns .btn-secondary {
+  width: 148px;
+  height: 42px;
+  padding: 0;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
 @media (max-width: 768px) {
   #page-landing { grid-template-columns: 1fr; }
@@ -758,4 +799,16 @@ body {
   .form-row { grid-template-columns: 1fr; }
   .profile-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr; }
+}
+
+#form-reserva .btn-secondary,
+#form-reserva .btn-primary {
+  padding: 0.75rem 1.8rem;
+  font-size: 0.95rem;
+  width: auto;
+  min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
 }
