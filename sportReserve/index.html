@@ -41,9 +41,9 @@
   <div class="modal-box">
     <div class="modal-title">Cancelar reserva?</div>
     <p style="color:var(--text2); font-size:0.9rem;">Esta ação não pode ser desfeita. Deseja realmente cancelar esta reserva?</p>
-    <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeModal('modal-cancel')">Voltar</button>
-      <button class="btn-primary" style="background:var(--red);" onclick="confirmCancel()">Cancelar reserva</button>
+    <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+      <button style="background:transparent;color:#f0f4ff;border:1.5px solid rgba(255,255,255,0.25);flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" onclick="closeModal('modal-cancel')">Voltar</button>
+      <button style="background:#e63946;color:#fff;border:1.5px solid #e63946;flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" onclick="confirmCancel()">Cancelar reserva</button>
     </div>
   </div>
 </div>
@@ -63,9 +63,9 @@
       <input class="form-input" type="password" id="forgot-newpass" placeholder="Mínimo 6 caracteres">
       <div class="form-error" id="err-forgot-newpass">Mínimo 6 caracteres</div>
     </div>
-    <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeModal('modal-forgot')">Cancelar</button>
-      <button class="btn-primary" id="btn-forgot-action" onclick="doForgotPassword()">Verificar e-mail</button>
+    <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+      <button style="background:transparent;color:#f0f4ff;border:1.5px solid rgba(255,255,255,0.3);flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" onclick="closeModal('modal-forgot')">Cancelar</button>
+      <button style="background:#e63946;color:#fff;border:1.5px solid #e63946;flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" id="btn-forgot-action" onclick="doForgotPassword()">Verificar e-mail</button>
     </div>
   </div>
 </div>
@@ -89,9 +89,9 @@
       <input class="form-input" type="password" id="cp-confirm" placeholder="Repita a nova senha">
       <div class="form-error" id="err-cp-confirm">As senhas não coincidem</div>
     </div>
-    <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeModal('modal-change-pass')">Cancelar</button>
-      <button class="btn-primary" onclick="doChangePassword()">Salvar nova senha</button>
+    <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+      <button style="background:transparent;color:#f0f4ff;border:1.5px solid rgba(255,255,255,0.3);flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" onclick="closeModal('modal-change-pass')">Cancelar</button>
+      <button style="background:#e63946;color:#fff;border:1.5px solid #e63946;flex:1;height:44px;padding:0;font-size:0.9rem;font-weight:700;font-family:Barlow,sans-serif;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;" onclick="doChangePassword()">Salvar nova senha</button>
     </div>
   </div>
 </div>
@@ -132,6 +132,10 @@
             <button type="button" onclick="togglePasswordVisibility('login-pass', this)" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--text2);">👁️</button>
           </div>
           <div class="form-error" id="err-login-pass">Senha incorreta</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+          <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+          <label for="remember-me" style="font-size:0.85rem;color:var(--text2);cursor:pointer;">Lembrar de mim</label>
         </div>
         <button class="btn-primary" onclick="doLogin()">Entrar</button>
         <p style="text-align:center; margin-top:1rem;">
@@ -310,6 +314,7 @@
         <div class="filter-tab" onclick="filterHist('Futsal', this)">Futsal</div>
         <div class="filter-tab" onclick="filterHist('Vôlei', this)">Vôlei</div>
         <div class="filter-tab" onclick="filterHist('Basquete', this)">Basquete</div>
+        <div class="filter-tab" onclick="filterHist('cancelada', this)">Canceladas</div>
       </div>
       <div class="card" style="overflow-x:auto;">
         <table class="hist-table">
@@ -442,7 +447,7 @@
       <div class="card" style="margin-top:1.5rem; text-align:center;">
         <div style="font-size:0.9rem; color:var(--text2); margin-bottom:1rem;">Ainda com dúvidas? Entre em contato:</div>
         <div style="font-weight:600;">📧 suporte@sportreserve.unex.edu.br</div>
-        <div style="font-size:0.85rem; color:var(--text3); margin-top:0.3rem;">📞 (79) 3999-1234 · ramal 218</div>
+        <div style="font-size:0.85rem; color:var(--text3); margin-top:0.3rem;">📞 (77) 9999-0000 · ramal 218</div>
       </div>
     </div>
 

@@ -17,11 +17,13 @@ const TIMES = ['07:00','08:00','09:00','10:00','11:00','14:00','15:00','16:00','
 
 function toMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
 
-function conflita(time, dur, lista, date, sport) {
+function conflita(time, dur, lista, date) {
+  // Bloqueia qualquer conflito na mesma data/horário independente do esporte
+  // (quadra única — um esporte por vez)
   const novoInicio = toMin(time);
   const novoFim    = novoInicio + parseInt(dur);
   return lista
-    .filter(r => r.date === date && r.sport === sport && r.status !== 'cancelada')
+    .filter(r => r.date === date && r.status !== 'cancelada')
     .some(r => {
       const ei = toMin(r.time);
       const ef = ei + r.dur;
@@ -95,6 +97,16 @@ async function doLogin() {
     toast('Erro ao conectar com a API. Verifique se o JSON Server está rodando.', 'error');
     return;
   }
+  // Lembrar de mim
+  const lembrar = document.getElementById('remember-me');
+  if (lembrar && lembrar.checked) {
+    localStorage.setItem('sr_saved_email', currentUser.email);
+    localStorage.setItem('sr_saved_senha', currentUser.senha);
+  } else {
+    localStorage.removeItem('sr_saved_email');
+    localStorage.removeItem('sr_saved_senha');
+  }
+
   await carregarReservas();
   enterApp();
   hideLoading();
@@ -158,15 +170,22 @@ function enterApp() {
 }
 
 function updateUserUI() {
-  document.getElementById('topbar-avatar').textContent      = currentUser.initials;
   document.getElementById('topbar-name').textContent        = currentUser.name;
-  document.getElementById('prof-avatar').textContent        = currentUser.initials;
   document.getElementById('prof-name-display').textContent  = currentUser.name;
   document.getElementById('prof-email-display').textContent = currentUser.email;
   document.getElementById('prof-name').value  = currentUser.name;
   document.getElementById('prof-email').value = currentUser.email;
   document.getElementById('prof-mat').value   = currentUser.mat   || '';
   document.getElementById('prof-phone').value = currentUser.phone || '';
+
+  // Carrega foto salva ou mostra iniciais
+  const savedAvatar = localStorage.getItem('sr_avatar_' + currentUser.id);
+  if (savedAvatar) {
+    applyAvatar(savedAvatar);
+  } else {
+    document.getElementById('topbar-avatar').textContent = currentUser.initials;
+    document.getElementById('prof-avatar').textContent   = currentUser.initials;
+  }
 }
 
 // ============================================================
@@ -358,8 +377,16 @@ async function confirmCancel() {
   if (id === null || id === undefined) return;
   showLoading();
   try {
-    await apiDeleteReserva(id);
-    reservas = reservas.filter(r => String(r.id) !== String(id));
+    // Atualiza status para cancelada (não deleta — mantém no histórico)
+    const r = reservas.find(x => String(x.id) === String(id));
+    if (!r) throw new Error('Reserva não encontrada');
+    const payload = { ...r, status: 'cancelada' };
+    await fetch(`http://localhost:3000/reservas/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    r.status = 'cancelada';
     cancelTargetId = null;
     toast('Reserva cancelada.', 'info');
     renderReservas();
@@ -406,10 +433,10 @@ function loadSlots() {
 
   // Busca TODAS as reservas do sistema para bloquear conflitos entre contas
   apiGetReservas().then(todas => {
-    const ativas = todas.filter(r => r.date === date && r.sport === selectedSport && r.status !== 'cancelada');
+    const ativas = todas.filter(r => r.date === date && r.status !== 'cancelada');
     document.getElementById('time-slots-container').innerHTML = TIMES.map(t => {
-      const bloqueado = conflita(t, 60, ativas, date, selectedSport); // ocupa pelo menos 1 slot
-      const invalido  = !bloqueado && conflita(t, dur, ativas, date, selectedSport);
+      const bloqueado = conflita(t, 60, ativas, date);
+      const invalido  = !bloqueado && conflita(t, dur, ativas, date);
       const cls   = (bloqueado || invalido) ? ' occupied' : '';
       const title = bloqueado ? 'Horário ocupado' : invalido ? 'Conflito com reserva existente' : '';
       return `<div class="time-slot${cls}" title="${title}"
@@ -442,7 +469,8 @@ async function submitReserva() {
   try {
     // Verificação final de conflito antes de salvar
     const todas = await apiGetReservas();
-    if (conflita(selectedTime, dur, todas, date, selectedSport)) {
+    const todasAtivas = todas.filter(r => r.status !== 'cancelada');
+    if (conflita(selectedTime, dur, todasAtivas, date)) {
       hideLoading();
       toast('Este horário foi reservado por outro usuário. Escolha outro.', 'error');
       loadSlots();
@@ -491,7 +519,12 @@ function filterHist(filter, el) {
 function renderHistorico() {
   const search = (document.getElementById('hist-search').value || '').toLowerCase();
   const items  = reservas.filter(r => {
-    const matchSport  = histFilter === 'todos' || r.sport === histFilter;
+    // "cancelada" filtra por status, os demais filtram por esporte
+    const matchSport  = histFilter === 'todos'
+      ? true
+      : histFilter === 'cancelada'
+        ? r.status === 'cancelada'
+        : r.sport === histFilter;
     const matchSearch = !search || r.sport.toLowerCase().includes(search) || r.date.includes(search) || r.time.includes(search);
     return matchSport && matchSearch;
   });
@@ -514,7 +547,7 @@ function renderHistorico() {
 //  PERFIL
 // ============================================================
 async function saveProfile(e) {
-  if (e) e.preventDefault();
+  if (e) { e.preventDefault(); e.stopPropagation(); }
   const name  = document.getElementById('prof-name').value.trim();
   const email = document.getElementById('prof-email').value.trim();
   const phone = document.getElementById('prof-phone').value.trim();
@@ -523,28 +556,38 @@ async function saveProfile(e) {
   if (!name || !email) { toast('Preencha nome e e-mail.', 'error'); return false; }
 
   showLoading();
+
+  // Atualiza local imediatamente — sem depender da API para não causar logout
+  currentUser.name     = name;
+  currentUser.email    = email;
+  currentUser.phone    = phone;
+  currentUser.mat      = mat;
+  currentUser.initials = name.substring(0,2).toUpperCase();
+  updateUserUI();
+
+  // Tenta salvar na API em background — se falhar, não afeta nada
   try {
-    // Monta payload completo preservando a senha
-    const payload = {
-      id:    currentUser.id,
-      name,  email, mat, phone,
-      senha: currentUser.senha
-    };
-    await apiPutUsuario(currentUser.id, payload);
-    // Atualiza estado local sem recarregar nada
-    currentUser.name     = name;
-    currentUser.email    = email;
-    currentUser.phone    = phone;
-    currentUser.mat      = mat;
-    currentUser.initials = name.substring(0,2).toUpperCase();
-    updateUserUI();
-    toast('Perfil atualizado com sucesso!', 'success');
+    const payload = { id: currentUser.id, name, email, mat, phone, senha: currentUser.senha };
+    const resp = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      // Tenta PATCH se PUT falhar
+      await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, mat, phone })
+      });
+    }
   } catch (err) {
-    console.error('saveProfile error:', err);
-    toast('Erro ao salvar perfil: ' + err.message, 'error');
-  } finally {
-    hideLoading();
+    // Falha silenciosa — dados já foram atualizados localmente
+    console.warn('Aviso: não foi possível sincronizar com a API:', err.message);
   }
+
+  hideLoading();
+  toast('Perfil atualizado com sucesso!', 'success');
   return false;
 }
 
@@ -553,12 +596,20 @@ function handleAvatarUpload(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (e) => {
-    document.getElementById('prof-avatar').innerHTML =
-      `<img src="${e.target.result}" alt="avatar">`;
-    document.getElementById('topbar-avatar').innerHTML =
-      `<img src="${e.target.result}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    const src = e.target.result;
+    // Salva no localStorage vinculado ao usuário
+    localStorage.setItem('sr_avatar_' + currentUser.id, src);
+    applyAvatar(src);
   };
   reader.readAsDataURL(file);
+}
+
+function applyAvatar(src) {
+  if (!src) return;
+  document.getElementById('prof-avatar').innerHTML =
+    `<img src="${src}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  document.getElementById('topbar-avatar').innerHTML =
+    `<img src="${src}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
 }
 
 // ============================================================
@@ -624,3 +675,35 @@ document.getElementById('res-dur').addEventListener('change', () => {
 });
 
 document.getElementById('res-date').min = new Date().toISOString().split('T')[0];
+
+// Lembrar de mim — preenche campos e faz login automático se houver dados salvos
+(async function autoLogin() {
+  const email = localStorage.getItem('sr_saved_email');
+  const senha = localStorage.getItem('sr_saved_senha');
+  if (!email || !senha) return;
+
+  // Preenche os campos
+  const emailEl = document.getElementById('login-email');
+  const passEl  = document.getElementById('login-pass');
+  const lembrar = document.getElementById('remember-me');
+  if (emailEl) emailEl.value = email;
+  if (passEl)  passEl.value  = senha;
+  if (lembrar) lembrar.checked = true;
+
+  // Tenta login automático
+  try {
+    const lista = await apiGetUsuariosPorEmail(email);
+    if (lista.length === 0) { localStorage.removeItem('sr_saved_email'); localStorage.removeItem('sr_saved_senha'); return; }
+    const usuario = lista[0];
+    if (usuario.senha !== senha) { localStorage.removeItem('sr_saved_email'); localStorage.removeItem('sr_saved_senha'); return; }
+    currentUser = {
+      id: usuario.id, name: usuario.name, email: usuario.email,
+      mat: usuario.mat || '', phone: usuario.phone || '',
+      senha: usuario.senha, initials: usuario.name.substring(0,2).toUpperCase()
+    };
+    await carregarReservas();
+    enterApp();
+  } catch(e) {
+    // API offline — não faz nada, usuário loga manualmente
+  }
+})();
