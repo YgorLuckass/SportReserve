@@ -2,7 +2,7 @@
 //  API.JS — Camada de comunicação com o JSON Server
 // ============================================================
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = window.API_BASE || 'http://localhost:3000';
 
 async function request(method, endpoint, body = null) {
   const options = { method, headers: { 'Content-Type': 'application/json' } };

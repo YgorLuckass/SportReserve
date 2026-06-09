@@ -490,7 +490,7 @@ async function confirmCancel() {
     const r = reservas.find((x) => String(x.id) === String(id));
     if (!r) throw new Error("Reserva não encontrada");
     const payload = { ...r, status: "cancelada" };
-    await fetch(`http://localhost:3000/reservas/${id}`, {
+    await fetch(`${window.API_BASE || 'http://localhost:3000'}/reservas/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -739,7 +739,7 @@ async function saveProfile(e) {
       senha: currentUser.senha,
     };
     const resp = await fetch(
-      `http://localhost:3000/usuarios/${currentUser.id}`,
+      `${window.API_BASE || 'http://localhost:3000'}/usuarios/${currentUser.id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -748,7 +748,7 @@ async function saveProfile(e) {
     );
     if (!resp.ok) {
       // Tenta PATCH se PUT falhar
-      await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+      await fetch(`${window.API_BASE || 'http://localhost:3000'}/usuarios/${currentUser.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, mat, phone }),
