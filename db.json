@@ -54,6 +54,61 @@
       "status": "confirmada",
       "players": "",
       "id": "2Aw3NcsOexU"
+    },
+    {
+      "userId": "DuPUkvElDqw",
+      "sport": "Futsal",
+      "date": "2026-06-17",
+      "time": "11:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": "",
+      "id": "dh3-LcgsMMA"
+    },
+    {
+      "userId": "DuPUkvElDqw",
+      "sport": "Futsal",
+      "date": "2026-06-15",
+      "time": "18:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": "",
+      "id": "LyUXf6GJEJA"
+    },
+    {
+      "userId": "DuPUkvElDqw",
+      "sport": "Futsal",
+      "date": "2026-06-27",
+      "time": "09:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": "",
+      "id": "yX6uImVuJik"
+    },
+    {
+      "userId": "DuPUkvElDqw",
+      "sport": "Futsal",
+      "date": "2026-06-15",
+      "time": "15:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": "",
+      "id": "4JWKt867imI"
+    },
+    {
+      "userId": "DuPUkvElDqw",
+      "sport": "Futsal",
+      "date": "2026-06-15",
+      "time": "08:00",
+      "dur": 60,
+      "local": "Quadra poliesportiva UNEX",
+      "status": "cancelada",
+      "players": "",
+      "id": "GhZcwBai5ms"
     }
   ],
   "usuarios": [
@@ -72,6 +127,14 @@
       "mat": "00000000000",
       "phone": "77988739837",
       "senha": "esqueciasenha2"
+    },
+    {
+      "name": "Nobru Apelo",
+      "email": "xxxxxygor@gmail.com",
+      "mat": "20245424424",
+      "phone": "",
+      "senha": "Tecl@do6",
+      "id": "DuPUkvElDqw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
